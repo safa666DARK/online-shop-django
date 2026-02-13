@@ -1,0 +1,48 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}ثبت‌نام{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 40px auto; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+    <h2 style="text-align: center; margin-bottom: 30px;">ایجاد حساب کاربری</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 20px;">
+            <label>نام کاربری:</label>
+            <input type="text" name="username" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label>رمز عبور:</label>
+            <input type="password" name="password1" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label>تکرار رمز عبور:</label>
+            <input type="password" name="password2" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+
+        <!-- بعد از فیلد username و قبل از فیلدهای رمز عبور -->
+        <div class="form-group">
+            <label for="email">ایمیل:</label>
+            <input type="email" name="email" id="email" class="form-control" required 
+                placeholder="example@gmail.com">
+            <small class="text-muted">ایمیل شما محرمانه می‌ماند و برای بازیابی رمز عبور نیاز است</small>
+        </div>
+        
+        <button type="submit" 
+                style="width: 100%; padding: 12px; background: #4361ee; color: white; border: none; border-radius: 8px; font-size: 16px;">
+            ثبت‌نام
+        </button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 20px;">
+        قبلاً حساب دارید؟ <a href="{% url 'login' %}">وارد شوید</a>
+    </p>
+</div>
+{% endblock %}

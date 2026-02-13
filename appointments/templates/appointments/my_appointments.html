@@ -1,0 +1,37 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}نوبت‌های من{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 40px auto; padding: 20px;">
+    <h2>📅 نوبت‌های من</h2>
+    
+    {% if appointments %}
+        {% for appointment in appointments %}
+        <div style="background: white; border-radius: 10px; padding: 20px; margin: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h4>{{ appointment.service.name }}</h4>
+            <p>📅 تاریخ: {{ appointment.date }}</p>
+            <p>⏰ ساعت: {{ appointment.time }}</p>
+            <p>👨‍🔧 تکنسین: {{ appointment.technician.name|default:"تخصیص خودکار" }}</p>
+            <p>📊 وضعیت: 
+                <span style="color: 
+                    {% if appointment.status == 'confirmed' %}green
+                    {% elif appointment.status == 'pending' %}orange
+                    {% elif appointment.status == 'cancelled' %}red
+                    {% else %}blue{% endif %};">
+                    {{ appointment.get_status_display }}
+                </span>
+            </p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div style="text-align: center; padding: 40px;">
+            <h3>هنوز نوبتی ثبت نکرده‌اید</h3>
+            <a href="{% url 'appointments:book' %}" 
+               style="display: inline-block; background: #4361ee; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; margin-top: 20px;">
+               رزرو نوبت جدید
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

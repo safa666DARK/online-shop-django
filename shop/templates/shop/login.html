@@ -1,0 +1,42 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}ورود به حساب{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 40px auto; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+    <h2 style="text-align: center; margin-bottom: 30px;">ورود به حساب کاربری</h2>
+    
+    {% if messages %}
+    <div style="background: #ffebee; color: #c62828; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 20px;">
+            <label>نام کاربری:</label>
+            <input type="text" name="username" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label>رمز عبور:</label>
+            <input type="password" name="password" required 
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+        
+        <button type="submit" 
+                style="width: 100%; padding: 12px; background: #4361ee; color: white; border: none; border-radius: 8px; font-size: 16px;">
+            ورود
+        </button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 20px;">
+        حساب ندارید؟ <a href="{% url 'shop:register' %}">ثبت‌نام کنید</a>
+    </p>
+</div>
+{% endblock %}

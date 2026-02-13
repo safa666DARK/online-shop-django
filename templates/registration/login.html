@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود به حساب کاربری</title>
+    <style>
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .login-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-header h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .login-header p {
+            color: #7f8c8d;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+        }
+        .register-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .error-message {
+            background: #ffeaea;
+            color: #c0392b;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .back-home {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2>🔐 ورود به حساب کاربری</h2>
+            <p>لطفاً اطلاعات خود را وارد کنید</p>
+        </div>
+
+        {% if form.errors %}
+        <div class="error-message">
+            نام کاربری یا رمز عبور اشتباه است!
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username">نام کاربری:</label>
+                {{ form.username }}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password">رمز عبور:</label>
+                {{ form.password }}
+            </div>
+            
+            <button type="submit" class="login-btn">ورود به حساب</button>
+        </form>
+
+        <div class="register-link">
+            حساب کاربری ندارید؟ 
+            <a href="{% url 'shop:register' %}">ثبت‌نام کنید</a>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="{% url 'shop:home' %}" class="back-home">← بازگشت به صفحه اصلی</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,163 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}تأیید سفارش - فروشگاه آنلاین{% endblock %}
+
+{% block content %}
+<style>
+    .confirmation-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+        text-align: center;
+    }
+    .success-icon {
+        font-size: 80px;
+        color: #2ecc71;
+        margin-bottom: 20px;
+    }
+    .confirmation-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-top: 30px;
+    }
+    .order-details {
+        text-align: right;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 15px;
+        margin: 30px 0;
+    }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+    .btn-download {
+        background: #3498db;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    .btn-download:hover {
+        background: #2980b9;
+        transform: translateY(-3px);
+    }
+    .btn-track {
+        background: #f8f9fa;
+        color: #333;
+        padding: 12px 25px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        border: 1px solid #ddd;
+        transition: all 0.3s;
+    }
+    .btn-track:hover {
+        background: #e8e8e8;
+        transform: translateY(-3px);
+    }
+    .btn-continue {
+        background: #2ecc71;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    .btn-continue:hover {
+        background: #27ae60;
+        transform: translateY(-3px);
+    }
+</style>
+
+<div class="confirmation-container">
+    <div class="success-icon">✅</div>
+    
+    <h1 style="color: #2c3e50; margin-bottom: 10px;">سفارش شما با موفقیت ثبت شد!</h1>
+    <p style="color: #666; font-size: 1.1rem; margin-bottom: 30px;">کد رهگیری سفارش شما: <strong>ORD-{{ order.id|stringformat:"06d" }}</strong></p>
+    
+    <div class="confirmation-card">
+        <h2 style="color: #2c3e50; margin-bottom: 20px;">📋 جزئیات سفارش</h2>
+        
+        <div class="order-details">
+            <div class="detail-row">
+                <span>شماره سفارش:</span>
+                <span style="color: #3498db; font-weight: bold;">#{{ order.id|stringformat:"06d" }}</span>
+            </div>
+            <div class="detail-row">
+                <span>تاریخ ثبت:</span>
+                <span>{{ order.created_at|date:"Y/m/d - H:i" }}</span>
+            </div>
+            <div class="detail-row">
+                <span>وضعیت:</span>
+                <span style="color: 
+                    {% if order.status == 'delivered' %}#2ecc71
+                    {% elif order.status == 'pending' %}#f39c12
+                    {% elif order.status == 'cancelled' %}#e74c3c
+                    {% else %}#3498db{% endif %}; font-weight: bold;">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+            <div class="detail-row">
+                <span>مبلغ قابل پرداخت:</span>
+                <span style="color: #2ecc71; font-weight: bold; font-size: 1.1rem;">{{ order.total_price|floatformat:"0" }} تومان</span>
+            </div>
+        </div>
+        
+        <h3 style="color: #2c3e50; text-align: right; margin-top: 30px;">📦 اقلام سفارش</h3>
+        <div style="background: white; border-radius: 10px; padding: 15px; margin-top: 15px; border: 1px solid #eee;">
+            {% for item in order.cart.items.all %}
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee;">
+                <span>{{ item.product.name }}</span>
+                <span>{{ item.quantity }} عدد × {{ item.product.price }} تومان</span>
+            </div>
+            {% endfor %}
+            
+            <div style="display: flex; justify-content: space-between; padding: 15px 0; font-weight: bold; border-top: 2px solid #eee; margin-top: 10px;">
+                <span>جمع کل:</span>
+                <span>{{ order.total_price }} تومان</span>
+            </div>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: right;">
+            <h4 style="color: #2c3e50; margin-bottom: 10px;">📍 آدرس ارسال</h4>
+            <p style="line-height: 1.8;">{{ order.shipping_address|linebreaks }}</p>
+        </div>
+        
+        <div style="background: #e8f4fd; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: right;">
+            <h4 style="color: #3498db; margin-bottom: 10px;">📢 نکات مهم</h4>
+            <ul style="text-align: right; padding-right: 20px; line-height: 1.8;">
+                <li>کد رهگیری سفارش خود را نزد خود نگه دارید.</li>
+                <li>می‌توانید وضعیت سفارش خود را از بخش "تاریخچه سفارشات" پیگیری کنید.</li>
+                <li>در صورت هر گونه سوال، با پشتیبانی تماس بگیرید.</li>
+                <li>یک ایمیل تأیید به آدرس شما ارسال شده است.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        <a href="#" class="btn-download">📥 دریافت فاکتور (PDF)</a>
+        <a href="{% url 'shop:order_history' %}" class="btn-track">📋 پیگیری سفارش</a>
+        <a href="{% url 'shop:home' %}" class="btn-continue">🛍️ ادامه خرید</a>
+    </div>
+    
+    <p style="color: #666; margin-top: 30px; font-size: 0.9rem;">
+        ✅ یک ایمیل تأیید به آدرس شما ارسال شد.<br>
+        ⏳ زمان تحویل تقریبی: ۲-۳ روز کاری
+    </p>
+</div>
+{% endblock %}

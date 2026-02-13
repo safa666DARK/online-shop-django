@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}فروشگاه آنلاین{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #212529;
+            --light: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+            direction: rtl;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        /* استایل‌های اصلی navbar (همان کد فعلی) */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        /* این بخش جدید: Media Query برای موبایل */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                padding: 10px;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.5rem;
+                margin-top: 15px;
+            }
+            
+            .nav-links a {
+                width: 100%;
+                text-align: center;
+                padding: 12px;
+                border-radius: 8px;
+                background: rgba(255,255,255,0.1);
+            }
+            
+            /* برای نمایش بهتر جستجو در موبایل */
+            .nav-links form {
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            .nav-links input[type="text"] {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 14px;
+            }
+            
+            .content {
+                padding: 0 10px;
+                margin: 1rem auto;
+            }
+            
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+        
+        .logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 20px;
+        }
+        
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 0 1.5rem;
+            margin-top: 4rem;
+            text-align: center; /* برای اینکه وسط بیفته */
+            width: 100%; /* این خط رو اضافه کن */
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            justify-content: center; /* برای اینکه وسط بیفته*/
+        }
+        
+        /* دکمه‌های مدرن */
+        .btn {
+            display: inline-block;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- نوار منو -->
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="{% url 'shop:home' %}">خانه</a>
+            <a href="{% url 'shop:product_list' %}">محصولات</a>
+            <a href="{% url 'shop:category_list' %}">دسته‌بندی‌ها</a>
+            {% if user.is_authenticated %}
+                <span style="color: #2ecc71;">👋 {{ user.username }}</span>
+                <a href="{% url 'logout' %}">خروج</a>
+            {% else %}
+                <a href="{% url 'login' %}">ورود</a>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'shop:order_history' %}" style="color: #3498db;">
+                    📋 تاریخچه سفارشات
+                </a>
+            {% endif %}
+
+            {% if user.is_staff or user.is_superuser %}
+            <li class="nav-item dropdown">
+                {% if user.is_staff or user.is_superuser %}
+                    <div style="display: inline-flex; gap: 15px; margin-right: 20px;">
+                        <a href="/admin/" style="color: #ff6b6b; font-weight: bold; text-decoration: none;">
+                            ⚙️ مدیریت
+                        </a>
+                        <a href="{% url 'appointments:calendar' %}" style="color: #3498db; text-decoration: none;">
+                            📅 تقویم
+                        </a>
+                        <a href="{% url 'shop:order_history' %}" style="color: #2ecc71; text-decoration: none;">
+                            📋 سفارشات
+                        </a>
+                    </div>
+                {% endif %}
+                <div class="dropdown-menu" aria-labelledby="adminDropdown">
+                    <a class="dropdown-item" href="{% url 'appointments:calendar' %}">
+                        📅 تقویم نوبت‌ها
+                    </a>
+                    <a class="dropdown-item" href="/admin/">
+                        ⚙️ پنل ادمین
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">
+                        👥 مدیریت کاربران
+                    </a>
+                    <a class="dropdown-item" href="#">
+                        📊 گزارش‌ها
+                    </a>
+                </div>
+            </li>
+            {% endif %}
+            
+            <!-- فرم جستجو -->
+            <form action="{% url 'shop:search' %}" method="get" style="display: inline; margin-right: 10px;">
+                <input type="text" name="q" placeholder="جستجوی محصول..." 
+                       style="padding: 5px 10px; border: 1px solid #ddd; border-radius: 20px; width: 150px;">
+                <button type="submit" 
+                        style="padding: 5px 15px; background: #e74c3c; color: white; border: none; border-radius: 20px; margin-right: 5px; cursor: pointer;">
+                    🔍
+                </button>
+                <a href="{% url 'shop:cart_detail' %}" style="color: #f39c12;">
+                    🛒 سبد خرید
+                </a>
+            </form>
+            
+            <a href="/admin/">پنل مدیریت</a>
+        </div>
+    </nav>
+
+    <!-- محتوای اصلی -->
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- فوتر -->
+    <div class="footer">
+        <p>© 2023 فروشگاه آنلاین - ساخته شده با Django</p>
+        <p>توسعه‌دهنده: صفا</p>
+    </div>
+
+    {% block extra_js %}{% endblock %}
+
+    <!-- Bootstrap JS -->
+<   script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

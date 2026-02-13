@@ -1,0 +1,33 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}تأیید نوبت{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 40px auto; text-align: center; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+    <div style="color: #2ecc71; font-size: 80px; margin-bottom: 20px;">✅</div>
+    
+    <h2>نوبت شما با موفقیت ثبت شد!</h2>
+    
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 30px 0; text-align: right;">
+        <p><strong>سرویس:</strong> {{ appointment.service.name }}</p>
+        <p><strong>تاریخ:</strong> {{ appointment.date }}</p>
+        <p><strong>ساعت:</strong> {{ appointment.time }}</p>
+        <p><strong>کد رهگیری:</strong> APPT-{{ appointment.id|stringformat:"06d" }}</p>
+    </div>
+    
+    <p style="color: #666; margin: 20px 0;">
+        یک ایمیل تأیید به آدرس شما ارسال شد. لطفاً ۱۵ دقیقه قبل از وقت مقرر در محل حاضر باشید.
+    </p>
+    
+    <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
+        <a href="{% url 'appointments:my' %}" 
+           style="background: #4361ee; color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none;">
+           مشاهده نوبت‌های من
+        </a>
+        <a href="{% url 'shop:home' %}" 
+           style="background: #f8f9fa; color: #333; padding: 12px 25px; border-radius: 8px; text-decoration: none; border: 1px solid #ddd;">
+           بازگشت به خانه
+        </a>
+    </div>
+</div>
+{% endblock %}

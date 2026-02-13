@@ -1,0 +1,209 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}سبد خرید{% endblock %}
+
+{% block content %}
+<style>
+    .cart-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .cart-header {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    .cart-item {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .item-info h4 {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+    }
+    .item-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .quantity {
+        font-weight: bold;
+        color: #3498db;
+    }
+    .price {
+        color: #2ecc71;
+        font-weight: bold;
+    }
+    .total-price {
+        font-size: 18px;
+        color: #e74c3c;
+    }
+    .remove-btn {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .empty-cart {
+        text-align: center;
+        padding: 40px;
+        color: #7f8c8d;
+    }
+    .continue-shopping {
+        display: inline-block;
+        margin-top: 20px;
+        background: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin: 30px 0;
+    }
+    .action-btn {
+        flex: 1;
+        padding: 15px;
+        border-radius: 10px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+    }
+    .btn-back {
+        background: #f8f9fa;
+        color: #333;
+        border: 2px solid #ddd;
+    }
+    .btn-back:hover {
+        background: #e8e8e8;
+        transform: translateY(-3px);
+    }
+    .btn-checkout {
+        background: linear-gradient(135deg, #4cc9f0, #4361ee);
+        color: white;
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+    .btn-checkout:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+    }
+
+    @media (max-width: 768px) {
+        .cart-item {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .item-actions {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="cart-container">
+    <div class="cart-header">
+        <h2>🛒 سبد خرید شما</h2>
+        {% if items %}
+        <p>{{ items|length }} کالا در سبد خرید</p>
+        {% endif %}
+    </div>
+
+    {% if items %}
+    {% for item in items %}
+    <div class="cart-item">
+        <div class="item-info">
+            <h4>{{ item.product.name }}</h4>
+            <p>{{ item.product.description|truncatewords:10 }}</p>
+        </div>
+        
+        <div class="item-actions">
+            <!-- دکمه کاهش تعداد -->
+            <form method="post" action="{% url 'shop:decrease_quantity' item.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                    ➖
+                </button>
+            </form>
+            
+            <span class="quantity">تعداد: {{ item.quantity }}</span>
+            
+            <!-- دکمه افزایش تعداد -->
+            <form method="post" action="{% url 'shop:increase_quantity' item.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" style="background: #2ecc71; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                    ➕
+                </button>
+            </form>
+            
+            <span class="price">{{ item.total_price|floatformat:"0" }} تومان</span>
+            
+            <!-- دکمه حذف -->
+            <a href="{% url 'shop:remove_from_cart' item.id %}" class="remove-btn">حذف</a>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <div style="text-align: left; padding: 20px; background: #f8f9fa; border-radius: 10px; margin-top: 30px;">
+        <h3>جمع کل: <span class="total-price">{{ total|floatformat:"0" }} تومان</span></h3>
+        <p style="color: #7f8c8d; margin-top: 10px;">هزینه ارسال در مرحله پرداخت محاسبه می‌شود</p>
+    </div>
+    
+    <!-- دکمه‌های عملیات -->
+    <div style="display: flex; justify-content: space-between; margin-top: 30px; gap: 15px;">
+        <!-- دکمه بازگشت به فروشگاه -->
+        <a href="{% url 'shop:product_list' %}" 
+        style="flex: 1; background: #f8f9fa; color: #333; padding: 15px; border-radius: 10px; text-decoration: none; text-align: center; font-weight: bold; border: 2px solid #ddd; transition: all 0.3s;">
+        ← بازگشت به فروشگاه
+        </a>
+        
+        <!-- دکمه ادامه خرید -->
+        <a href="{% url 'shop:checkout' %}" 
+        style="flex: 1; background: linear-gradient(135deg, #4cc9f0, #4361ee); color: white; padding: 15px; border-radius: 10px; text-decoration: none; text-align: center; font-weight: bold; transition: all 0.3s; box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);">
+        🚀 ادامه فرآیند خرید
+        </a>
+    </div>
+
+    <p style="color: #666; margin-top: 10px; text-align: center;">
+        💡 هزینه ارسال برای خریدهای بالای ۱۰۰,۰۰۰ تومان رایگان است
+    </p>
+    
+    {% else %}
+    <div class="empty-cart">
+        <h3>سبد خرید شما خالی است</h3>
+        <p>می‌توانید از لیست محصولات، کالای مورد نظر خود را انتخاب کنید</p>
+        <a href="{% url 'shop:product_list' %}" class="continue-shopping">ادامه خرید</a>
+    </div>
+
+    <div style="text-align: left; margin-top: 30px; padding-top: 20px; border-top: 2px solid #4361ee;">
+        <a href="{% url 'shop:checkout' %}" 
+           style="display: inline-block; background: linear-gradient(135deg, #4cc9f0, #4361ee); color: white; padding: 15px 30px; border-radius: 10px; text-decoration: none; font-size: 1.1rem; font-weight: bold;">
+           🚀 ادامه فرآیند خرید
+        </a>
+        <p style="color: #666; margin-top: 10px;">پس از تأیید نهایی، وارد مرحله پرداخت خواهید شد.</p>
+    </div>
+    
+    {% endif %}
+</div>
+{% endblock %}

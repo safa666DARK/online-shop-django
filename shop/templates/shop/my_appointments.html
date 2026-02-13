@@ -1,0 +1,220 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}نوبت‌های من{% endblock %}
+
+{% block content %}
+<style>
+    .appointments-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .appointment-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s;
+        border-right: 5px solid;
+    }
+    
+    .appointment-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .appointment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .appointment-id {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #4361ee;
+    }
+    
+    .appointment-status {
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    
+    .status-pending { background: #fff3cd; color: #856404; border-color: #856404; }
+    .status-confirmed { background: #d4edda; color: #155724; border-color: #155724; }
+    .status-completed { background: #cce5ff; color: #004085; border-color: #004085; }
+    .status-cancelled { background: #f8d7da; color: #721c24; border-color: #721c24; }
+    
+    .appointment-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .detail-box {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .detail-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
+    .detail-value {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    
+    .appointment-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+    
+    .action-btn {
+        padding: 8px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary {
+        background: #4361ee;
+        color: white;
+    }
+    
+    .btn-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+    
+    .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 20px;
+    }
+    
+    .new-appointment-btn {
+        display: inline-block;
+        margin-top: 20px;
+        background: linear-gradient(135deg, #4cc9f0, #4361ee);
+        color: white;
+        padding: 15px 30px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+        transition: transform 0.3s;
+    }
+    
+    .new-appointment-btn:hover {
+        transform: translateY(-3px);
+    }
+</style>
+
+<div class="appointments-container">
+    <div class="page-header">
+        <h1>📅 نوبت‌های رزرو شده من</h1>
+        <p style="color: #666;">مدیریت و پیگیری تمام نوبت‌های شما</p>
+        <a href="{% url 'shop:book_appointment' %}" class="new-appointment-btn">
+            ＋ رزرو نوبت جدید
+        </a>
+    </div>
+
+    {% if appointments %}
+    {% for appointment in appointments %}
+    <div class="appointment-card" style="border-right-color: 
+        {% if appointment.status == 'pending' %}#856404
+        {% elif appointment.status == 'confirmed' %}#155724
+        {% elif appointment.status == 'completed' %}#004085
+        {% else %}#721c24{% endif %};">
+        
+        <div class="appointment-header">
+            <div class="appointment-id">نوبت #{{ appointment.id }}</div>
+            <div class="appointment-status status-{{ appointment.status }}">
+                {{ appointment.get_status_display }}
+            </div>
+        </div>
+        
+        <div class="appointment-details">
+            <div class="detail-box">
+                <div class="detail-label">🛠️ سرویس</div>
+                <div class="detail-value">{{ appointment.service.name }}</div>
+            </div>
+            
+            <div class="detail-box">
+                <div class="detail-label">📅 تاریخ</div>
+                <div class="detail-value">{{ appointment.date|date:"Y/m/d" }}</div>
+            </div>
+            
+            <div class="detail-box">
+                <div class="detail-label">🕒 ساعت</div>
+                <div class="detail-value">{{ appointment.time }}</div>
+            </div>
+            
+            <div class="detail-box">
+                <div class="detail-label">💰 هزینه</div>
+                <div class="detail-value" style="color: #2ecc71;">
+                    {{ appointment.service.price }} تومان
+                </div>
+            </div>
+            
+            {% if appointment.technician %}
+            <div class="detail-box">
+                <div class="detail-label">👨‍🔧 تکنسین</div>
+                <div class="detail-value">{{ appointment.technician.name }}</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="appointment-actions">
+            {% if appointment.status == 'pending' %}
+            <a href="#" class="action-btn btn-primary">تغییر زمان</a>
+            <a href="#" class="action-btn btn-danger">لغو نوبت</a>
+            {% endif %}
+            
+            <a href="{% url 'shop:appointment_confirmation' appointment.id %}" 
+               class="action-btn" style="background: #f8f9fa; color: #333;">
+                مشاهده جزئیات
+            </a>
+        </div>
+        
+    </div>
+    {% endfor %}
+    
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <h3>هنوز نوبتی رزرو نکرده‌اید</h3>
+        <p>می‌توانید اولین نوبت خود را به راحتی رزرو کنید.</p>
+        <a href="{% url 'shop:book_appointment' %}" class="new-appointment-btn">
+            رزرو اولین نوبت
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

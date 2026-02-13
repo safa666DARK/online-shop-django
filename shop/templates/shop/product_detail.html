@@ -1,0 +1,321 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}{{ product.name }} - فروشگاه آنلاین{% endblock %}
+
+{% block content %}
+<style>
+    .product-detail {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .product-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    @media (max-width: 768px) {
+        .product-container {
+            grid-template-columns: 1fr;
+        }
+    }
+    .product-images {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .main-image {
+        width: 100%;
+        height: 400px;
+        object-fit: contain;
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+    }
+    .product-info h1 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-size: 1.8rem;
+    }
+    .price {
+        color: #2ecc71;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 20px 0;
+    }
+    .stock-status {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    .in-stock {
+        background: #d4edda;
+        color: #155724;
+    }
+    .out-of-stock {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        margin: 30px 0;
+    }
+    .btn-add-cart {
+        background: #2ecc71;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        flex: 1;
+        transition: all 0.3s;
+    }
+    .btn-add-cart:hover {
+        background: #27ae60;
+        transform: translateY(-3px);
+    }
+    .btn-buy-now {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        flex: 1;
+        transition: all 0.3s;
+    }
+    .btn-buy-now:hover {
+        background: #2980b9;
+        transform: translateY(-3px);
+    }
+    .product-description {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+        line-height: 1.8;
+    }
+</style>
+
+<div class="product-detail">
+    <!-- مسیر ناوبری -->
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'shop:home' %}" style="color: #3498db;">خانه</a> / 
+        <a href="{% url 'shop:category_list' %}" style="color: #3498db;">دسته‌بندی‌ها</a> / 
+        <a href="#" style="color: #3498db;">{{ product.category.name }}</a> / 
+        <span>{{ product.name }}</span>
+    </div>
+    
+    <div class="product-container">
+        <!-- بخش تصاویر -->
+        <div class="product-images">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="main-image">
+            {% else %}
+            <div class="main-image" style="display: flex; align-items: center; justify-content: center; color: #666;">
+                <span>بدون تصویر</span>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- بخش اطلاعات -->
+        <div class="product-info">
+            <h1>{{ product.name }}</h1>
+            
+            <div class="price">{{ product.price|floatformat:"0" }} تومان</div>
+            
+            <div class="stock-status {% if product.stock > 0 %}in-stock{% else %}out-of-stock{% endif %}">
+                {% if product.stock > 0 %}
+                ✅ موجود در انبار ({{ product.stock }} عدد)
+                {% else %}
+                ❌ ناموجود
+                {% endif %}
+            </div>
+            
+            <div class="action-buttons">
+                <!-- فرم افزودن به سبد خرید -->
+                <form method="POST" action="{% url 'shop:add_to_cart' product.id %}" id="addToCartForm" style="flex: 1;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-add-cart" id="addToCartBtn">
+                        🛒 افزودن به سبد خرید
+                    </button>
+                </form>
+                
+                <!-- فرم خرید سریع -->
+                <form method="POST" action="{% url 'shop:buy_now' product.id %}" id="buyNowForm" style="flex: 1;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-buy-now" id="buyNowBtn">
+                        💳 خرید سریع
+                    </button>
+                </form>
+            </div>
+            
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // دکمه افزودن به سبد خرید
+                document.getElementById('addToCartBtn').addEventListener('click', function(e) {
+                    e.preventDefault(); // اول جلوگیری کنیم
+                    console.log('دکمه افزودن به سبد خرید کلیک شد');
+                    
+                    // اگر محصول موجود نیست
+                    {% if product.stock == 0 %}
+                        alert('این محصول ناموجود است!');
+                        return false;
+                    {% endif %}
+                    
+                    // submit فرم
+                    document.getElementById('addToCartForm').submit();
+                });
+                
+                // دکمه خرید سریع
+                document.getElementById('buyNowBtn').addEventListener('click', function(e) {
+                    e.preventDefault(); // اول جلوگیری کنیم
+                    console.log('دکمه خرید سریع کلیک شد');
+                    
+                    // اگر محصول موجود نیست
+                    {% if product.stock == 0 %}
+                        alert('این محصول ناموجود است!');
+                        return false;
+                    {% endif %}
+                    
+                    // submit فرم
+                    document.getElementById('buyNowForm').submit();
+                });
+            });
+            </script>
+            
+            <!-- اطلاعات محصول -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 10px; color: #666;">دسته‌بندی:</td>
+                        <td style="padding: 10px;"><strong>{{ product.category.name }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; color: #666;">کد محصول:</td>
+                        <td style="padding: 10px;"><strong>#{{ product.id|stringformat:"06d" }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; color: #666;">تاریخ ثبت:</td>
+                        <td style="padding: 10px;"><strong>{{ product.created_at|date:"Y/m/d" }}</strong></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="{% url 'shop:add_review' product.id %}" 
+                   style="display: inline-block; background: #f39c12; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">
+                   ⭐ ثبت نظر و امتیاز
+                </a>
+            </div>
+            
+            <!-- توضیحات کامل -->
+            <div class="product-description">
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">📋 توضیحات محصول</h3>
+                <p>{{ product.description|linebreaks }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- بخش نظرات و امتیازات -->
+    <div style="margin-top: 50px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h3 style="color: #2c3e50;">⭐ نظرات کاربران</h3>
+            
+            <div style="display: flex; align-items: center; gap: 20px;">
+                {% if avg_rating %}
+                <div style="background: #f8f9fa; padding: 10px 20px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 1.8rem; color: #f39c12; font-weight: bold;">{{ avg_rating }}</div>
+                    <div style="color: #666; font-size: 0.9rem;">از ۵</div>
+                </div>
+                {% endif %}
+                
+                <a href="{% url 'shop:add_review' product.id %}" 
+                style="background: #3498db; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">
+                ثبت نظر جدید
+                </a>
+            </div>
+        </div>
+        
+        {% if reviews %}
+            <!-- خلاصه امتیازات -->
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 15px; margin-bottom: 30px;">
+                <h4 style="color: #2c3e50; margin-bottom: 15px;">امتیازات کاربران</h4>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 2.5rem; color: #f39c12;">{{ avg_rating|default:"-" }}</div>
+                    <div>
+                        <div style="color: #f39c12; font-size: 1.5rem; direction: ltr;">
+                            {% with avg=avg_rating|default:0 %}
+                            {% with full_stars=avg|floatformat:"0"|add:"0" %}
+                            {% with empty_stars=5|add:"-"|add:full_stars %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= full_stars %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                            {% endwith %}
+                            {% endwith %}
+                        </div>
+                        <div style="color: #666;">بر اساس {{ review_count }} نظر</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- لیست نظرات -->
+            <div style="background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                {% for review in reviews %}
+                <div style="padding: 20px 0; border-bottom: 1px solid #eee;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <div style="font-weight: bold; color: #2c3e50;">{{ review.user.username }}</div>
+                        <div style="color: #f39c12; direction: ltr;">
+                            {{ review.get_stars|safe }}
+                        </div>
+                    </div>
+                    
+                    <p style="color: #666; line-height: 1.8; margin-bottom: 10px;">{{ review.comment }}</p>
+                    
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #888;">
+                        <span>{{ review.created_at|date:"Y/m/d" }}</span>
+                        {% if review.user == request.user %}
+                        <a href="{% url 'shop:add_review' product.id %}" style="color: #3498db;">ویرایش نظر</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- اگر نظری وجود ندارد -->
+            <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 15px;">
+                <div style="font-size: 60px; color: #ddd; margin-bottom: 20px;">💬</div>
+                <h4 style="color: #666; margin-bottom: 15px;">هنوز نظری ثبت نشده است</h4>
+                <p style="color: #888; margin-bottom: 20px;">اولین نفری باشید که برای این محصول نظر می‌دهد</p>
+                <a href="{% url 'shop:add_review' product.id %}" 
+                style="display: inline-block; background: #3498db; color: white; padding: 12px 30px; border-radius: 10px; text-decoration: none;">
+                ثبت اولین نظر
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- محصولات مرتبط (می‌تونی بعداً اضافه کنی) -->
+    <div style="margin-top: 50px;">
+        <h3 style="color: #2c3e50; margin-bottom: 20px;">🛒 محصولات مشابه</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+            <!-- اینجا بعداً محصولات هم‌دسته رو نمایش می‌دیم -->
+        </div>
+    </div>
+</div>
+{% endblock %}

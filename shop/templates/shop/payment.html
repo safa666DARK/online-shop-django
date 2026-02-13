@@ -1,0 +1,84 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}پرداخت - فروشگاه آنلاین{% endblock %}
+
+{% block content %}
+<style>
+    .payment-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    .payment-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .payment-amount {
+        font-size: 2.5rem;
+        color: #2ecc71;
+        font-weight: bold;
+        margin: 20px 0;
+    }
+    .payment-test {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin: 30px 0;
+        text-align: right;
+    }
+    .btn-pay-test {
+        background: #2ecc71;
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 10px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: all 0.3s;
+        width: 100%;
+    }
+    .btn-pay-test:hover {
+        background: #27ae60;
+        transform: translateY(-3px);
+    }
+</style>
+
+<div class="payment-container">
+    <div class="payment-card">
+        <h1 style="color: #2c3e50; margin-bottom: 20px;">💳 درگاه پرداخت تستی</h1>
+        
+        <div class="payment-amount">{{ payment_amount|floatformat:"0" }} تومان</div>
+        
+        <div class="payment-test">
+            <p><strong>شماره سفارش:</strong> #{{ order.id|stringformat:"06d" }}</p>
+            <p><strong>تاریخ:</strong> {{ order.created_at|date:"Y/m/d - H:i" }}</p>
+            <p><strong>وضعیت:</strong> در انتظار پرداخت</p>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin: 20px 0; text-align: right;">
+            <h4 style="color: #856404; margin-bottom: 10px;">⚠️ توجه</h4>
+            <p style="color: #856404;">این یک درگاه پرداخت <strong>تستی</strong> است. در نسخه واقعی به زرین‌پال متصل خواهد شد.</p>
+            <p style="color: #856404; margin-top: 10px;">برای تست، روی دکمه زیر کلیک کنید.</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-pay-test">
+                پرداخت تستی موفق
+            </button>
+        </form>
+        
+        <div style="margin-top: 30px; display: flex; gap: 15px;">
+            <a href="{% url 'shop:order_history' %}" 
+               style="flex: 1; background: #f8f9fa; color: #333; padding: 12px; border-radius: 10px; text-decoration: none; text-align: center; border: 1px solid #ddd;">
+               انصراف و بازگشت
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

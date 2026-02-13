@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تأیید سفارش</title>
+    <style>
+        body {
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f8f9fa;
+            padding: 20px;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .email-header {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .email-body {
+            padding: 30px;
+        }
+        .order-details {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .products-table th, .products-table td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+        .email-footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .btn {
+            display: inline-block;
+            background: #4361ee;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin: 10px 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- هدر ایمیل -->
+        <div class="email-header">
+            <h1 style="margin: 0; font-size: 1.8rem;">✅ سفارش شما ثبت شد!</h1>
+            <p style="margin: 10px 0 0; opacity: 0.9;">کد رهگیری: <strong>ORD-{{ order.id|stringformat:"06d" }}</strong></p>
+        </div>
+        
+        <!-- بدنه ایمیل -->
+        <div class="email-body">
+            <p>سلام {{ order.user.username }} عزیز،</p>
+            <p>سفارش شما با موفقیت ثبت شد. از اینکه ما را انتخاب کردید متشکریم!</p>
+            
+            <!-- جزئیات سفارش -->
+            <div class="order-details">
+                <div class="detail-row">
+                    <span>شماره سفارش:</span>
+                    <span style="font-weight: bold;">#{{ order.id|stringformat:"06d" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span>تاریخ سفارش:</span>
+                    <span>{{ order.created_at|date:"Y/m/d - H:i" }}</span>
+                </div>
+                <div class="detail-row">
+                    <span>وضعیت:</span>
+                    <span style="color: #2ecc71; font-weight: bold;">{{ order.get_status_display }}</span>
+                </div>
+                <div class="detail-row" style="border-bottom: none;">
+                    <span>مبلغ قابل پرداخت:</span>
+                    <span style="color: #2ecc71; font-weight: bold; font-size: 1.2rem;">{{ order.total_price|floatformat:"0" }} تومان</span>
+                </div>
+            </div>
+            
+            <!-- لیست محصولات -->
+            <h3 style="color: #2c3e50; margin-bottom: 15px;">📦 اقلام سفارش</h3>
+            <table class="products-table">
+                <thead>
+                    <tr style="background: #f8f9fa;">
+                        <th>محصول</th>
+                        <th>تعداد</th>
+                        <th>قیمت</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.cart.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.total_price|floatformat:"0" }} تومان</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- آدرس ارسال -->
+            <h3 style="color: #2c3e50; margin-top: 30px; margin-bottom: 15px;">📍 آدرس ارسال</h3>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                {{ order.shipping_address|linebreaks }}
+            </div>
+            
+            <!-- دکمه‌های اقدام -->
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="http://127.0.0.1:8000{% url 'shop:order_confirmation' order.id %}" class="btn">
+                    مشاهده جزئیات سفارش
+                </a>
+                <a href="http://127.0.0.1:8000{% url 'shop:order_history' %}" class="btn" style="background: #f8f9fa; color: #333;">
+                    تاریخچه سفارشات
+                </a>
+            </div>
+        </div>
+        
+        <!-- فوتر ایمیل -->
+        <div class="email-footer">
+            <p>با تشکر از خرید شما،</p>
+            <p><strong>فروشگاه آنلاین ما</strong></p>
+            <p>پشتیبانی: support@example.com | تلفن: ۰۲۱-۱۲۳۴۵۶۷۸</p>
+            <p style="font-size: 0.8rem; margin-top: 15px; color: #999;">
+                این ایمیل به صورت خودکار ارسال شده است. لطفاً به آن پاسخ ندهید.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

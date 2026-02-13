@@ -1,0 +1,184 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}تأیید رزرو نوبت{% endblock %}
+
+{% block content %}
+<style>
+    .confirmation-container {
+        max-width: 600px;
+        margin: 40px auto;
+        text-align: center;
+    }
+    
+    .success-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #4cc9f0, #4361ee);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        font-size: 36px;
+        color: white;
+        animation: bounce 1s;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+    
+    .appointment-details {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-top: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: right;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .detail-value {
+        font-weight: bold;
+        color: #333;
+    }
+    
+    .appointment-id {
+        font-size: 1.5rem;
+        color: #4361ee;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+    }
+    
+    .action-btn {
+        padding: 12px 30px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary {
+        background: #4361ee;
+        color: white;
+    }
+    
+    .btn-secondary {
+        border: 2px solid #4361ee;
+        color: #4361ee;
+        background: white;
+    }
+    
+    .reminder {
+        background: #e8f4fd;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+        text-align: right;
+    }
+</style>
+
+<div class="confirmation-container">
+    <div class="success-icon">✓</div>
+    
+    <h1>🎉 نوبت شما با موفقیت رزرو شد!</h1>
+    <p style="color: #666; font-size: 1.1rem; margin-top: 10px;">
+        اطلاعات نوبت شما ثبت شد و در انتظار تأیید نهایی است.
+    </p>
+    
+    <div class="appointment-id">شماره پیگیری: #{{ appointment.id }}</div>
+    <div class="status-badge status-pending">{{ appointment.get_status_display }}</div>
+    
+    <div class="appointment-details">
+        <h3>📋 جزئیات رزرو</h3>
+        
+        <div class="detail-row">
+            <span class="detail-label">سرویس:</span>
+            <span class="detail-value">{{ appointment.service.name }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">تاریخ:</span>
+            <span class="detail-value">{{ appointment.date|date:"Y/m/d" }}</span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">ساعت:</span>
+            <span class="detail-value">{{ appointment.time }}</span>
+        </div>
+        
+        {% if appointment.technician %}
+        <div class="detail-row">
+            <span class="detail-label">تکنسین:</span>
+            <span class="detail-value">{{ appointment.technician.name }}</span>
+        </div>
+        {% endif %}
+        
+        <div class="detail-row">
+            <span class="detail-label">هزینه:</span>
+            <span class="detail-value" style="color: #2ecc71; font-size: 1.1rem;">
+                {{ appointment.service.price }} تومان
+            </span>
+        </div>
+        
+        <div class="detail-row">
+            <span class="detail-label">تاریخ ثبت:</span>
+            <span class="detail-value">{{ appointment.created_at|date:"Y/m/d - H:i" }}</span>
+        </div>
+    </div>
+    
+    <div class="reminder">
+        <h4>📌 نکات مهم:</h4>
+        <ul style="margin-right: 20px; color: #666;">
+            <li>لطفاً ۱۵ دقیقه قبل از زمان مقرر در محل حاضر باشید.</li>
+            <li>در صورت نیاز به لغو نوبت، حداقل ۲ ساعت قبل اطلاع دهید.</li>
+            <li>می‌توانید وضعیت نوبت خود را در بخش "نوبت‌های من" پیگیری کنید.</li>
+        </ul>
+    </div>
+    
+    <div class="actions">
+        <a href="{% url 'shop:my_appointments' %}" class="action-btn btn-primary">
+            📋 مشاهده نوبت‌های من
+        </a>
+        <a href="{% url 'shop:home' %}" class="action-btn btn-secondary">
+            🏠 بازگشت به صفحه اصلی
+        </a>
+    </div>
+</div>
+{% endblock %}

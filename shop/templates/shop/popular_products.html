@@ -1,0 +1,130 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}محصولات پربازدید{% endblock %}
+
+{% block content %}
+<style>
+    .popular-header {
+        text-align: center;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        color: white;
+        margin-bottom: 40px;
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .popular-list {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .popular-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        display: grid;
+        grid-template-columns: 100px 1fr auto;
+        gap: 25px;
+        align-items: center;
+        transition: transform 0.3s;
+    }
+    
+    .popular-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .rank-badge {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #f72585, #b5179e);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    .product-info h3 {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+    }
+    
+    .view-count {
+        background: #e8f4fd;
+        color: #3498db;
+        padding: 10px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        text-align: center;
+        min-width: 120px;
+    }
+    
+    .view-icon {
+        font-size: 20px;
+        margin-left: 5px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+    
+    @media (max-width: 768px) {
+        .popular-card {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+        
+        .rank-badge {
+            margin: 0 auto;
+        }
+    }
+</style>
+
+<div class="popular-header">
+    <h1>🔥 پربازدیدترین محصولات</h1>
+    <p>محبوب‌ترین محصولات بین کاربران</p>
+</div>
+
+<div class="popular-list">
+    {% if products %}
+    {% for product in products %}
+    <a href="{% url 'shop:product_detail' product.id %}" style="text-decoration: none; color: inherit;">
+        <div class="popular-card">
+            <div class="rank-badge">
+                {{ forloop.counter }}
+            </div>
+            
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p style="color: #666; margin-bottom: 10px;">{{ product.description|truncatewords:15 }}</p>
+                <div style="color: #2ecc71; font-weight: bold; font-size: 1.1rem;">
+                    {{ product.price }} تومان
+                </div>
+            </div>
+            
+            <div class="view-count">
+                <span>{{ product.view_count }}</span>
+                <span class="view-icon">👁️</span>
+                <div style="font-size: 0.9rem; color: #7f8c8d;">بازدید</div>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+    {% else %}
+    <div class="empty-state">
+        <h3>📊 هنوز آماری ثبت نشده</h3>
+        <p>پس از بازدید کاربران از محصولات، آمار نمایش داده می‌شود.</p>
+        <a href="{% url 'shop:product_list' %}" style="display: inline-block; margin-top: 20px; padding: 12px 30px; background: #4361ee; color: white; border-radius: 8px; text-decoration: none;">
+            مشاهده محصولات
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

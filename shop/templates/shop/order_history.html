@@ -1,0 +1,201 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}تاریخچه سفارشات - فروشگاه آنلاین{% endblock %}
+
+{% block content %}
+<style>
+    .orders-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    .orders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+    }
+    @media (max-width: 768px) {
+        .orders-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .order-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+        border: 1px solid #f0f0f0;
+    }
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    .order-id {
+        color: #3498db;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .order-status {
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-paid { background: #d4edda; color: #155724; }
+    .status-processing { background: #cce5ff; color: #004085; }
+    .status-shipped { background: #d1ecf1; color: #0c5460; }
+    .status-delivered { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    .order-items {
+        margin: 15px 0;
+    }
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px dashed #eee;
+    }
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 2px solid #eee;
+    }
+    .order-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    .btn-action {
+        flex: 1;
+        padding: 8px;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+    }
+    .btn-view {
+        background: #3498db;
+        color: white;
+    }
+    .btn-track {
+        background: #f8f9fa;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+    .empty-orders {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+        grid-column: 1 / -1;
+    }
+</style>
+
+<div class="orders-container">
+    <div class="page-header">
+        <h1 style="color: #2c3e50;">📋 تاریخچه سفارشات</h1>
+        <a href="{% url 'shop:home' %}" 
+           style="background: #f8f9fa; color: #333; padding: 10px 20px; border-radius: 10px; text-decoration: none; border: 1px solid #ddd;">
+           ← بازگشت به فروشگاه
+        </a>
+    </div>
+    
+    {% if orders %}
+    <div class="orders-grid">
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <span class="order-id">سفارش #{{ order.id|stringformat:"06d" }}</span>
+                <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+            </div>
+            
+            <div style="color: #666; font-size: 0.9rem; margin-bottom: 10px;">
+                📅 {{ order.created_at|date:"Y/m/d - H:i" }}
+            </div>
+            
+            <div class="order-items">
+                {% for item in order.cart.items.all %}
+                <div class="order-item">
+                    <span>{{ item.product.name }}</span>
+                    <span>{{ item.quantity }} × {{ item.product.price }} تومان</span>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="order-total">
+                <span>مبلغ کل:</span>
+                <span>{{ order.total_price|floatformat:"0" }} تومان</span>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.9rem;">
+                📍 <strong>آدرس ارسال:</strong><br>
+                {{ order.shipping_address|linebreaks }}
+            </div>
+            
+            <div class="order-actions">
+                <a href="{% url 'shop:order_confirmation' order.id %}" class="btn-action btn-view">
+                    مشاهده فاکتور
+                </a>
+                <a href="#" class="btn-action btn-track">
+                    پیگیری سفارش
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-orders">
+        <div style="font-size: 60px; margin-bottom: 20px;">📭</div>
+        <h3>هنوز سفارشی ثبت نکرده‌اید</h3>
+        <p style="margin: 15px 0; color: #888;">پس از ثبت اولین سفارش، تاریخچه آن در این صفحه نمایش داده می‌شود.</p>
+        <a href="{% url 'shop:product_list' %}" 
+           style="display: inline-block; background: #4361ee; color: white; padding: 12px 30px; border-radius: 10px; text-decoration: none; margin-top: 15px;">
+           🛍️ مشاهده محصولات
+        </a>
+    </div>
+    {% endif %}
+    
+    <!-- پیجینیشن (اگر تعداد سفارشات زیاد شد) -->
+    {% if orders.has_other_pages %}
+    <div style="display: flex; justify-content: center; gap: 10px; margin-top: 40px;">
+        {% if orders.has_previous %}
+        <a href="?page={{ orders.previous_page_number }}" 
+           style="padding: 8px 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333;">
+            قبلی
+        </a>
+        {% endif %}
+        
+        <span style="padding: 8px 15px; background: #4361ee; color: white; border-radius: 8px;">
+            صفحه {{ orders.number }} از {{ orders.paginator.num_pages }}
+        </span>
+        
+        {% if orders.has_next %}
+        <a href="?page={{ orders.next_page_number }}" 
+           style="padding: 8px 15px; background: #f8f9fa; border-radius: 8px; text-decoration: none; color: #333;">
+            بعدی
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
