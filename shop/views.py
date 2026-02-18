@@ -396,3 +396,24 @@ def add_review(request, product_id):
         'existing_review': existing_review,
     }
     return render(request, 'shop/add_review.html', context)
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Product
+from .serializers import ProductSerializer
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from . import apiviews  # به جای views از apiviews استفاده می‌کنیم
+
+router = DefaultRouter()
+router.register(r'products', apiviews.ProductViewSet)
+
+urlpatterns = [
+    path('api/', include(router.urls)),
+]
+
+@api_view(['GET'])
+def product_list(request):
+    products = Product.objects.all()  # همه محصولات رو میگیره
+    serializer = ProductSerializer(products, many=True)  # تبدیل به JSON
+    return Response(serializer.data)

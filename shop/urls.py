@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from rest_framework.routers import DefaultRouter
+from . import apiviews
 
 app_name = 'shop'
 
@@ -25,4 +27,5 @@ urlpatterns = [
     path('cart/decrease/<int:item_id>/', views.decrease_quantity, name='decrease_quantity'),
     path('payment/<int:order_id>/', views.process_payment, name='process_payment'),
     path('product/<int:product_id>/review/', views.add_review, name='add_review'),
+
 ]
