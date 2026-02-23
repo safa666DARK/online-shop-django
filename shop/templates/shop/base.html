@@ -28,7 +28,7 @@
             min-height: 100vh;
         }
         
-        /* استایل‌های اصلی navbar (همان کد فعلی) */
+        /* نوار منو */
         .navbar {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             padding: 1rem 0;
@@ -51,74 +51,7 @@
             display: flex;
             align-items: center;
             gap: 1.5rem;
-        }
-
-        /* این بخش جدید: Media Query برای موبایل */
-        @media (max-width: 768px) {
-            .nav-container {
-                flex-direction: column;
-                padding: 10px;
-            }
-            
-            .nav-links {
-                flex-direction: column;
-                width: 100%;
-                gap: 0.5rem;
-                margin-top: 15px;
-            }
-            
-            .nav-links a {
-                width: 100%;
-                text-align: center;
-                padding: 12px;
-                border-radius: 8px;
-                background: rgba(255,255,255,0.1);
-            }
-            
-            /* برای نمایش بهتر جستجو در موبایل */
-            .nav-links form {
-                width: 100%;
-                margin: 10px 0;
-            }
-            
-            .nav-links input[type="text"] {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                font-size: 14px;
-            }
-            
-            .content {
-                padding: 0 10px;
-                margin: 1rem auto;
-            }
-            
-            .hero h1 {
-                font-size: 1.5rem;
-            }
-            
-            .hero p {
-                font-size: 1rem;
-            }
-        }
-        
-        .logo {
-            color: white;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
+            flex-wrap: wrap;
         }
         
         .nav-links a {
@@ -135,6 +68,16 @@
             transform: translateY(-2px);
         }
         
+        .logo {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
         .content {
             max-width: 1200px;
             margin: 2rem auto;
@@ -146,8 +89,8 @@
             color: white;
             padding: 3rem 0 1.5rem;
             margin-top: 4rem;
-            text-align: center; /* برای اینکه وسط بیفته */
-            width: 100%; /* این خط رو اضافه کن */
+            text-align: center;
+            width: 100%;
         }
 
         .footer-content {
@@ -157,10 +100,10 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
-            justify-content: center; /* برای اینکه وسط بیفته*/
+            justify-content: center;
         }
         
-        /* دکمه‌های مدرن */
+        /* دکمه‌ها */
         .btn {
             display: inline-block;
             padding: 0.6rem 1.5rem;
@@ -200,8 +143,42 @@
             margin: 30px 0;
         }
 
-        /* تنظیمات کلی برای موبایل */
+        /* ===== تنظیمات موبایل ===== */
         @media (max-width: 768px) {
+            .navbar {
+                padding: 0.5rem 0;
+                position: relative; /* sticky رو برمیداریم */
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                padding: 10px;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.5rem;
+                max-height: 300px;
+                overflow-y: auto;
+            }
+            
+            .nav-links a {
+                width: 100%;
+                text-align: center;
+                padding: 10px;
+                background: rgba(255,255,255,0.1);
+            }
+            
+            .nav-links form {
+                width: 100%;
+                margin: 5px 0;
+            }
+            
+            .nav-links input[type="text"] {
+                width: 100%;
+            }
+            
             .content {
                 padding: 0 10px;
                 margin: 1rem auto;
@@ -209,28 +186,32 @@
                 overflow-x: hidden;
             }
             
-            /* برای جدول‌ها */
             table {
                 display: block;
                 overflow-x: auto;
                 white-space: nowrap;
             }
             
-            /* برای تصاویر */
             img {
                 max-width: 100%;
                 height: auto;
             }
             
-            /* برای کارت‌ها */
             .card, .product-card {
                 width: 100% !important;
                 margin: 10px 0 !important;
             }
             
-            /* برای فرم‌ها */
             input, select, textarea {
                 max-width: 100%;
+            }
+            
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
             }
         }
     </style>
@@ -239,70 +220,42 @@
 <body>
     <!-- نوار منو -->
     <nav class="navbar">
-        <div class="nav-links">
-            <a href="{% url 'shop:home' %}">خانه</a>
-            <a href="{% url 'shop:product_list' %}">محصولات</a>
-            <a href="{% url 'shop:category_list' %}">دسته‌بندی‌ها</a>
-            {% if user.is_authenticated %}
-                <span style="color: #2ecc71;">👋 {{ user.username }}</span>
-                <a href="{% url 'logout' %}">خروج</a>
-            {% else %}
-                <a href="{% url 'login' %}">ورود</a>
-            {% endif %}
-
-            {% if user.is_authenticated %}
-                <a href="{% url 'shop:order_history' %}" style="color: #3498db;">
-                    📋 تاریخچه سفارشات
-                </a>
-            {% endif %}
-
-            {% if user.is_staff or user.is_superuser %}
-            <li class="nav-item dropdown">
-                {% if user.is_staff or user.is_superuser %}
-                    <div style="display: inline-flex; gap: 15px; margin-right: 20px;">
-                        <a href="/admin/" style="color: #ff6b6b; font-weight: bold; text-decoration: none;">
-                            ⚙️ مدیریت
-                        </a>
-                        <a href="{% url 'appointments:calendar' %}" style="color: #3498db; text-decoration: none;">
-                            📅 تقویم
-                        </a>
-                        <a href="{% url 'shop:order_history' %}" style="color: #2ecc71; text-decoration: none;">
-                            📋 سفارشات
-                        </a>
-                    </div>
+        <div class="nav-container">
+            <div class="nav-links">
+                <a href="{% url 'shop:home' %}">خانه</a>
+                <a href="{% url 'shop:product_list' %}">محصولات</a>
+                <a href="{% url 'shop:category_list' %}">دسته‌بندی‌ها</a>
+                
+                {% if user.is_authenticated %}
+                    <span style="color: #2ecc71;">👋 {{ user.username }}</span>
+                    <a href="{% url 'logout' %}">خروج</a>
+                {% else %}
+                    <a href="{% url 'login' %}">ورود</a>
                 {% endif %}
-                <div class="dropdown-menu" aria-labelledby="adminDropdown">
-                    <a class="dropdown-item" href="{% url 'appointments:calendar' %}">
-                        📅 تقویم نوبت‌ها
-                    </a>
-                    <a class="dropdown-item" href="/admin/">
-                        ⚙️ پنل ادمین
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">
-                        👥 مدیریت کاربران
-                    </a>
-                    <a class="dropdown-item" href="#">
-                        📊 گزارش‌ها
-                    </a>
-                </div>
-            </li>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'shop:order_history' %}" style="color: #3498db;">📋 تاریخچه سفارشات</a>
+                {% endif %}
+                
+                <!-- فرم جستجو -->
+                <form action="{% url 'shop:search' %}" method="get" style="display: inline;">
+                    <input type="text" name="q" placeholder="جستجوی محصول..." 
+                           style="padding: 5px 10px; border: 1px solid #ddd; border-radius: 20px;">
+                    <button type="submit" 
+                            style="padding: 5px 15px; background: #e74c3c; color: white; border: none; border-radius: 20px; cursor: pointer;">🔍</button>
+                </form>
+                
+                <a href="{% url 'shop:cart_detail' %}" style="color: #f39c12;">🛒 سبد خرید</a>
+                <a href="/admin/">⚙️ پنل مدیریت</a>
+            </div>
+            
+            {% if user.is_staff or user.is_superuser %}
+            <div style="display: flex; gap: 15px; margin-top: 10px;">
+                <a href="/admin/" style="color: #ff6b6b;">⚙️ مدیریت</a>
+                <a href="{% url 'appointments:calendar' %}" style="color: #3498db;">📅 تقویم</a>
+                <a href="{% url 'shop:order_history' %}" style="color: #2ecc71;">📋 سفارشات</a>
+            </div>
             {% endif %}
-            
-            <!-- فرم جستجو -->
-            <form action="{% url 'shop:search' %}" method="get" style="display: inline; margin-right: 10px;">
-                <input type="text" name="q" placeholder="جستجوی محصول..." 
-                       style="padding: 5px 10px; border: 1px solid #ddd; border-radius: 20px; width: 150px;">
-                <button type="submit" 
-                        style="padding: 5px 15px; background: #e74c3c; color: white; border: none; border-radius: 20px; margin-right: 5px; cursor: pointer;">
-                    🔍
-                </button>
-                <a href="{% url 'shop:cart_detail' %}" style="color: #f39c12;">
-                    🛒 سبد خرید
-                </a>
-            </form>
-            
-            <a href="/admin/">پنل مدیریت</a>
         </div>
     </nav>
 
@@ -314,13 +267,15 @@
 
     <!-- فوتر -->
     <div class="footer">
-        <p>© 2023 فروشگاه آنلاین - ساخته شده با Django</p>
-        <p>توسعه‌دهنده: صفا</p>
+        <div class="footer-content">
+            <p>© 2023 فروشگاه آنلاین - ساخته شده با Django</p>
+            <p>توسعه‌دهنده: صفا</p>
+        </div>
     </div>
 
     {% block extra_js %}{% endblock %}
 
     <!-- Bootstrap JS -->
-<   script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
